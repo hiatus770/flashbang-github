@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package anchor.v1.capabilities.notifications;
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1.capabilities.notifications";
+option swift_prefix = "ANCHNotifications";
+
+// Contract for org.anchor.notifications@1. It transfers notification metadata;
+// icons, intents, and platform handles are deliberately not protocol objects.
+message NotificationPosted {
+  string notification_id = 1;
+  string application_id = 2;
+  string application_name = 3;
+  string title = 4;
+  string body = 5;
+  uint64 posted_at_unix_ms = 6;
+  repeated NotificationAction actions = 7;
+}
+
+message NotificationAction {
+  string action_id = 1;
+  string label = 2;
+}
+
+message NotificationDismissed {
+  string notification_id = 1;
+}
+
+message NotificationInvokeAction {
+  string notification_id = 1;
+  string action_id = 2;
+}

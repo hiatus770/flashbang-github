@@ -1,0 +1,13 @@
+/target/
+**/target/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.der
+*.log
+/device_id
+/desktop_device_id
+/flashbang.yaml
+/.config/

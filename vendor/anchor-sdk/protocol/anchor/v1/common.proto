@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package anchor.v1;
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1";
+option swift_prefix = "ANCH";
+
+// A stable routing identifier derived from a node's public identity key.
+//
+// It is deliberately opaque on the wire. Implementations must validate its
+// exact 32-byte encoding at their protocol boundary; receiving this value does
+// not authenticate the peer. TLS certificate pinning does that.
+message NodeId {
+  bytes value = 1;
+}
+
+// The protocol version advertised by a peer. Version negotiation rules belong
+// to session.proto; this type exists here so pairing and session use one shape.
+message ProtocolVersion {
+  uint32 major = 1;
+  uint32 minor = 2;
+}
+
+// Display-only metadata supplied by a peer. Do not use this data for routing,
+// authorization, or security decisions.
+message PeerDisplayInfo {
+  string display_name = 1;
+  DeviceKind device_kind = 2;
+}
+
+enum DeviceKind {
+  DEVICE_KIND_UNSPECIFIED = 0;
+  DEVICE_KIND_DESKTOP = 1;
+  DEVICE_KIND_PHONE = 2;
+  DEVICE_KIND_TABLET = 3;
+}
+
+// Stable protocol-visible failures. SDKs may attach local diagnostic context,
+// but callers must be able to handle these codes without parsing text.
+enum ErrorCode {
+  ERROR_CODE_UNSPECIFIED = 0;
+  ERROR_CODE_PROTOCOL_VIOLATION = 1;
+  ERROR_CODE_VERSION_UNSUPPORTED = 2;
+  ERROR_CODE_PAIRING_REQUIRED = 3;
+  ERROR_CODE_PAIRING_EXPIRED = 4;
+  ERROR_CODE_TRUST_REJECTED = 5;
+  ERROR_CODE_PERMISSION_DENIED = 6;
+  ERROR_CODE_CAPABILITY_UNAVAILABLE = 7;
+  ERROR_CODE_RESOURCE_EXHAUSTED = 8;
+  ERROR_CODE_REQUEST_CANCELLED = 9;
+  ERROR_CODE_CONNECTION_CLOSING = 10;
+}
+
+message ProtocolError {
+  ErrorCode code = 1;
+
+  // Safe, concise diagnostic text for logs and developer tools. It must not
+  // include credentials, private paths, message payloads, or stack traces.
+  string message = 2;
+}

@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package anchor.v1.capabilities.device;
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1.capabilities.device";
+option swift_prefix = "ANCHDevice";
+
+// Contract for org.anchor.device@1. Fields intentionally describe current
+// coarse state only; fine-grained location and long-lived telemetry are not a
+// part of this capability.
+message DeviceState {
+  uint32 battery_percent = 1;
+  bool charging = 2;
+  bool on_wifi = 3;
+  string device_name = 4;
+
+  // Physical display bounds in pixels. A zero value means the peer could not
+  // determine its display size.
+  uint32 display_width = 5;
+  uint32 display_height = 6;
+}

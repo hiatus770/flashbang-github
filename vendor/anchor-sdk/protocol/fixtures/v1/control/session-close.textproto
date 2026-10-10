@@ -1,0 +1,3 @@
+session_close {
+  reason: ERROR_CODE_PROTOCOL_VIOLATION
+}

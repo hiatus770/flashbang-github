@@ -1,0 +1,37 @@
+[package]
+name = "anchor-sdk"
+version = "1.0.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Native Rust implementation of the Anchor protocol SDK"
+
+[dependencies]
+bytes = "1.12.1"
+prost = "0.14.4"
+quinn = "0.11.9"
+rustc-hash = "2"
+# Quinn defaults to the ring provider. Select that same provider explicitly so
+# rustls never has two process-wide crypto providers competing at runtime.
+rustls = { version = "0.23.36", default-features = false, features = ["ring", "std"] }
+rustls-pemfile = "2.2.0"
+sha2 = "0.10"
+socket2 = "0.6"
+thiserror = "2.0.20"
+tokio = { version = "1.48.0", features = ["io-util", "macros", "net", "rt-multi-thread", "sync", "time"] }
+
+[build-dependencies]
+prost-build = "0.14.4"
+
+[dev-dependencies]
+hex = "0.4"
+rcgen = "0.14.7"
+proptest = "1"
+criterion = { version = "0.8", features = ["html_reports"] }
+
+[[bench]]
+name = "video_frame"
+harness = false
+
+[[bench]]
+name = "transport"
+harness = false

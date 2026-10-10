@@ -1,0 +1,11 @@
+# Match the device name to one shown by your OpenRGB SDK server.
+applications:
+  - name: "discord"
+    regex: "(?i)discord"
+    function: "blink_red"
+  - name: "signal message"
+    regex: "(?i)signal"
+    function: "blink_red"
+
+devices:
+  - name: "Your OpenRGB device name"

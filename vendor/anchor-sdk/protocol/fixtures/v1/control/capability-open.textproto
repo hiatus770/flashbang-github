@@ -1,0 +1,7 @@
+request_id: 1
+capability_open {
+  capability_session_id: 1
+  endpoint_id: "io.anchor.desktop"
+  capability_name: "org.anchor.clipboard"
+  capability_major: 1
+}

@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package anchor.v1;
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1";
+option swift_prefix = "ANCH";
+
+// Binds a QUIC bidirectional stream to an already-open capability session.
+// The opener must send this control record before writing application bytes to
+// that QUIC stream and must wait for StreamOpened. `quic_stream_id` uses the
+// transport's canonical QUIC stream ID, represented as an unsigned integer.
+message StreamOpen {
+  uint64 quic_stream_id = 1;
+  uint64 capability_session_id = 2;
+
+  // The capability record type carried on this stream. It must be one of the
+  // type URLs advertised by the bound capability session. Keeping this in
+  // the binding makes stream routing explicit before application bytes flow.
+  string payload_type_url = 3;
+
+  reserved 4;
+  reserved "purpose", "declared_length";
+}
+
+message StreamOpened {
+  uint64 quic_stream_id = 1;
+}
+
+// Stops accepting new bytes for the declared content stream. QUIC reset/finish
+// remains the authoritative transport-level completion signal.
+message StreamClose {
+  uint64 quic_stream_id = 1;
+}

@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package anchor.v1.capabilities.input;
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1.capabilities.input";
+option swift_prefix = "ANCHInput";
+
+// Control contract for org.anchor.input@1. Providers must require an explicit
+// host-policy grant before accepting this capability. Relative pointer motion
+// may use a negotiated datagram flow; it has a compact fixed binary payload and
+// is intentionally not represented as a protobuf message.
+
+message InputKey {
+  // USB HID usage ID. SDKs do not translate this into platform key codes.
+  uint32 hid_usage = 1;
+  bool pressed = 2;
+}
+
+message InputText {
+  string text_utf8 = 1;
+}
+
+message InputPointerAbsolute {
+  // Coordinates are normalized to [0, 65535] across the selected target.
+  uint32 x = 1;
+  uint32 y = 2;
+  // Stable Wayland output name selected by the sender. Empty preserves the
+  // legacy desktop-selected mapping for older clients.
+  string target_output_name = 3;
+}
+
+message InputPointerRelative {
+  // Relative motion in thousandths of a compositor pixel. Fixed-point keeps
+  // the control record deterministic without putting platform floats on wire.
+  sint32 dx_1000ths = 1;
+  sint32 dy_1000ths = 2;
+}
+
+enum PointerButton {
+  POINTER_BUTTON_UNSPECIFIED = 0;
+  POINTER_BUTTON_LEFT = 1;
+  POINTER_BUTTON_MIDDLE = 2;
+  POINTER_BUTTON_RIGHT = 3;
+  POINTER_BUTTON_BACK = 4;
+  POINTER_BUTTON_FORWARD = 5;
+}
+
+message InputPointerButton {
+  PointerButton button = 1;
+  bool pressed = 2;
+}
+
+message InputScroll {
+  // Wheel units are signed 1/120th steps. High-resolution sources accumulate
+  // before emitting; receivers must not infer device pixels from these values.
+  sint32 horizontal_120ths = 1;
+  sint32 vertical_120ths = 2;
+}

@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package anchor.v1.capabilities.screen;
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1.capabilities.screen";
+option swift_prefix = "ANCHScreen";
+
+// Control contract for org.anchor.screen@1 (Sideboat). Encoded video frames
+// travel over the negotiated datagram flow, not as protobuf records. A provider
+// advertises the type URLs for the messages it accepts/sends from this file.
+
+message ScreenStart {
+  // Zero lets the provider choose. A non-zero value is a preference, not a
+  // guarantee; the resulting values appear in ScreenStatus.
+  uint32 max_fps = 1;
+  uint32 target_bitrate_kbps = 2;
+
+  // Empty selects the provider's current default output.
+  string output_id = 3;
+}
+
+message ScreenStop {}
+
+message ScreenSelectOutput {
+  string output_id = 1;
+}
+
+message ScreenRequestKeyframe {}
+
+message ScreenOutputList {
+  repeated ScreenOutput outputs = 1;
+}
+
+message ScreenOutput {
+  string output_id = 1;
+  string display_name = 2;
+  uint32 width = 3;
+  uint32 height = 4;
+  uint32 refresh_millihz = 5;
+}
+
+enum ScreenState {
+  SCREEN_STATE_UNSPECIFIED = 0;
+  SCREEN_STATE_STOPPED = 1;
+  SCREEN_STATE_STARTING = 2;
+  SCREEN_STATE_STREAMING = 3;
+  SCREEN_STATE_PAUSED = 4;
+  SCREEN_STATE_FAILED = 5;
+}
+
+message ScreenStatus {
+  ScreenState state = 1;
+  string output_id = 2;
+  uint32 width = 3;
+  uint32 height = 4;
+  uint32 fps = 5;
+  uint32 bitrate_kbps = 6;
+}
+
+enum VideoCodec {
+  VIDEO_CODEC_UNSPECIFIED = 0;
+  VIDEO_CODEC_H264 = 1;
+  VIDEO_CODEC_HEVC = 2;
+  VIDEO_CODEC_AV1 = 3;
+}
+
+// Decoder configuration for subsequent datagram frames. config_id is copied
+// into the fixed binary datagram header, so a receiver can discard frames that
+// precede or mismatch the configuration without decoding their payload.
+message ScreenCodecConfig {
+  VideoCodec codec = 1;
+  uint64 config_id = 2;
+  bytes codec_config = 3;
+}
+
+// Sent by the viewer after loss, decoder reset, or joining an existing flow.
+message ScreenKeyframeNeeded {}

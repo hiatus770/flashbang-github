@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package anchor.v1.capabilities.commands;
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1.capabilities.commands";
+option swift_prefix = "ANCHCommands";
+
+// Contract for org.anchor.commands@1. A caller selects a command ID configured
+// by the provider. There is deliberately no raw shell command, shell fragment,
+// working directory, or environment-variable field in this protocol.
+message CommandRun {
+  string command_id = 1;
+  repeated string arguments = 2;
+}
+
+message CommandDefinition {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  bool detach = 4;
+}
+
+message CommandList {
+  repeated CommandDefinition commands = 1;
+}
+
+message CommandKill {
+  string execution_id = 1;
+}
+
+message CommandResult {
+  sint32 exit_code = 1;
+  string stdout = 2;
+  string stderr = 3;
+  // Optional typed correlation fields.  The original three fields remain
+  // unchanged for wire compatibility with early v1 implementations.
+  string command_id = 4;
+  string execution_id = 5;
+  string status = 6;
+  string error = 7;
+}

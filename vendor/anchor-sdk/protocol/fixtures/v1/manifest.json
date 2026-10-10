@@ -1,0 +1,81 @@
+{
+  "protocol": "anchor/1.0",
+  "control_framing": "ANCR + major:u8 + minor:u8 + unsigned-varint length + ControlEnvelope",
+  "cases": [
+    {
+      "name": "pairing-reject",
+      "source": "control/pairing-reject.textproto",
+      "wire": "control/pairing-reject.hex",
+      "expected": "accept_as_pairing_reject_notification"
+    },
+    {
+      "name": "correlation-both-fields-set",
+      "expected": "reject_protocol_violation",
+      "reason": "ControlEnvelope request_id and response_to are mutually exclusive"
+    },
+    {
+      "name": "pairing-hello-wrong-invitation-length",
+      "expected": "reject_protocol_violation",
+      "reason": "PairingInvitation invitation_id must contain exactly 16 bytes"
+    },
+    {
+      "name": "capability-record-unadvertised-type-url",
+      "expected": "reject_capability_unavailable",
+      "reason": "CapabilityRecord type_url must be negotiated for its capability session"
+    },
+    {
+      "name": "capability-open",
+      "source": "control/capability-open.textproto",
+      "wire": "control/capability-open.hex",
+      "expected": "accept_as_capability_open_request"
+    },
+    {
+      "name": "stream-open",
+      "source": "control/stream-open.textproto",
+      "wire": "control/stream-open.hex",
+      "expected": "accept_as_stream_open_request"
+    },
+    {
+      "name": "datagram-flow-open",
+      "source": "control/datagram-flow-open.textproto",
+      "wire": "control/datagram-flow-open.hex",
+      "expected": "accept_as_datagram_flow_open_request"
+    },
+    {
+      "name": "ping",
+      "source": "control/ping.textproto",
+      "wire": "control/ping.hex",
+      "expected": "accept_as_ping_notification"
+    },
+    {
+      "name": "pong",
+      "source": "control/pong.textproto",
+      "wire": "control/pong.hex",
+      "expected": "accept_as_pong_notification"
+    },
+    {
+      "name": "capability-opened",
+      "source": "control/capability-opened.textproto",
+      "wire": "control/capability-opened.hex",
+      "expected": "accept_as_capability_opened_response"
+    },
+    {
+      "name": "stream-opened",
+      "source": "control/stream-opened.textproto",
+      "wire": "control/stream-opened.hex",
+      "expected": "accept_as_stream_opened_response"
+    },
+    {
+      "name": "datagram-flow-opened",
+      "source": "control/datagram-flow-opened.textproto",
+      "wire": "control/datagram-flow-opened.hex",
+      "expected": "accept_as_datagram_flow_opened_response"
+    },
+    {
+      "name": "session-close",
+      "source": "control/session-close.textproto",
+      "wire": "control/session-close.hex",
+      "expected": "accept_as_session_close_notification"
+    }
+  ]
+}

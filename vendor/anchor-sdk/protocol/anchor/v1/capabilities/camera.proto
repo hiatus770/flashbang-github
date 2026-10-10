@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package anchor.v1.capabilities.camera;
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1.capabilities.camera";
+option swift_prefix = "ANCHCamera";
+
+// Control contract for org.anchor.camera@1. Frames use a negotiated QUIC
+// datagram flow; microphone/audio is explicitly outside this capability major.
+message CameraStart {
+  uint32 max_width = 1;
+  uint32 max_height = 2;
+  uint32 max_fps = 3;
+  uint32 target_bitrate_kbps = 4;
+  string camera_id = 5;
+}
+
+message CameraStop {}
+
+enum CameraState {
+  CAMERA_STATE_UNSPECIFIED = 0;
+  CAMERA_STATE_STOPPED = 1;
+  CAMERA_STATE_STARTING = 2;
+  CAMERA_STATE_STREAMING = 3;
+  CAMERA_STATE_FAILED = 4;
+}
+
+message CameraStatus {
+  CameraState state = 1;
+  uint32 width = 2;
+  uint32 height = 3;
+  uint32 fps = 4;
+  uint32 bitrate_kbps = 5;
+}
+
+enum CameraCodec {
+  CAMERA_CODEC_UNSPECIFIED = 0;
+  CAMERA_CODEC_H264 = 1;
+  CAMERA_CODEC_HEVC = 2;
+  CAMERA_CODEC_AV1 = 3;
+}
+
+message CameraCodecConfig {
+  CameraCodec codec = 1;
+  uint64 config_id = 2;
+  bytes codec_config = 3;
+}
+
+message CameraKeyframeNeeded {}
+
+// Desktop-originated camera controls.  Values not used by a given kind are
+// ignored; this keeps the record compact without putting platform-specific
+// command strings on the wire.
+message CameraControl {
+  enum Kind {
+    CAMERA_CONTROL_UNSPECIFIED = 0;
+    START = 1;
+    STOP = 2;
+    SWITCH_CAMERA = 3;
+    SET_STREAM_PARAMS = 4;
+    SET_ZOOM_RATIO = 5;
+    SET_LINEAR_ZOOM = 6;
+    SET_TORCH = 7;
+    SET_EXPOSURE = 8;
+  }
+  Kind kind = 1;
+  uint32 fps = 2;
+  uint32 bitrate_kbps = 3;
+  float zoom_ratio = 4;
+  float linear_zoom = 5;
+  sint32 exposure = 6;
+  bool torch_enabled = 7;
+}

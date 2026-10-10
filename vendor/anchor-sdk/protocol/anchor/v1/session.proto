@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package anchor.v1;
+
+import "anchor/v1/capability.proto";
+import "anchor/v1/common.proto";
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1";
+option swift_prefix = "ANCH";
+
+// The first control record on every authenticated normal-session connection.
+// Pairing-only connections use PairingHello instead and never advertise
+// capabilities. The SDK verifies the TLS certificate pin before delivering a
+// SessionHello to its host application.
+message SessionHello {
+  ProtocolVersion protocol_version = 1;
+  NodeId node_id = 2;
+  PeerDisplayInfo display = 3;
+  repeated EndpointAdvertisement endpoints = 4;
+}
+
+// Sent in reply to a valid SessionHello. A peer must not open a capability
+// until it has received SessionReady from the other side.
+message SessionReady {
+  ProtocolVersion protocol_version = 1;
+}
+
+// Idle detection only. QUIC itself supplies transport-level liveness; these
+// messages let SDKs expose a uniform application-session state to hosts.
+message Ping {
+  uint64 nonce = 1;
+}
+
+message Pong {
+  uint64 nonce = 1;
+}
+
+// A best-effort notice before a normal close. It is not a substitute for QUIC
+// close handling and must not make a peer wait indefinitely to release state.
+message SessionClose {
+  ErrorCode reason = 1;
+}

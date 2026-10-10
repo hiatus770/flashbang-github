@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package anchor.v1;
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1";
+option swift_prefix = "ANCH";
+
+// Negotiates one replaceable QUIC-datagram flow for an established capability.
+// Datagram bytes do not use protobuf framing: their fixed binary header will be
+// specified beside fixtures so media frames avoid per-packet protobuf overhead.
+message DatagramFlowOpen {
+  uint64 capability_session_id = 1;
+  uint64 flow_id = 2;
+  string payload_type_url = 3;
+}
+
+message DatagramFlowOpened {
+  uint64 flow_id = 1;
+}
+
+message DatagramFlowClose {
+  uint64 flow_id = 1;
+}

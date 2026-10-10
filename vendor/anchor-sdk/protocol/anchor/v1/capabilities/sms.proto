@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package anchor.v1.capabilities.sms;
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1.capabilities.sms";
+option swift_prefix = "ANCHSms";
+
+// Contract for org.anchor.sms@1. The provider owns platform SMS permissions
+// and recipients; this protocol never exposes a provider's raw database.
+message SmsMessage {
+  string message_id = 1;
+  string conversation_id = 2;
+  string address = 3;
+  string body = 4;
+  uint64 timestamp_unix_ms = 5;
+  bool outgoing = 6;
+}
+
+message SmsSend {
+  string client_message_id = 1;
+  string address = 2;
+  string body = 3;
+}
+
+message SmsSendResult {
+  string client_message_id = 1;
+  bool accepted_by_platform = 2;
+}
+
+// Typed pagination contract for the desktop message UI. These records keep
+// Android's telephony-provider IDs on the provider side and never require a
+// generic JSON control channel.
+message ConversationRequest {
+  int64 conversation_id = 1;
+  int64 before_timestamp_unix_ms = 2; // <= 0 requests newest messages
+  uint32 limit = 3;
+}
+
+message ConversationListRequest {}
+
+message SmsAddress {
+  string address = 1;
+  string display_name = 2;
+  bytes avatar_jpeg = 3;
+}
+
+message SmsAttachment {
+  int64 part_id = 1;
+  string mime_type = 2;
+  bytes thumbnail_jpeg = 3;
+  string transfer_id = 4;
+}
+
+message ConversationMessage {
+  int64 message_id = 1;
+  int64 conversation_id = 2;
+  uint32 event = 3;
+  string body = 4;
+  repeated SmsAddress addresses = 5;
+  uint64 timestamp_unix_ms = 6;
+  uint32 message_type = 7;
+  bool read = 8;
+  int64 subscription_id = 9;
+  repeated SmsAttachment attachments = 10;
+}
+
+message ConversationSnapshot {
+  int64 conversation_id = 1;
+  repeated ConversationMessage messages = 2;
+  bool has_more_before = 3;
+}
+
+message ConversationList {
+  repeated ConversationMessage latest_messages = 1;
+}
+
+message AttachmentRequest {
+  int64 part_id = 1;
+  string transfer_id = 2;
+}

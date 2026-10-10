@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package anchor.v1.capabilities.files;
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1.capabilities.files";
+option swift_prefix = "ANCHFiles";
+
+// Contract for org.anchor.files@1. File bytes travel on a StreamOpen accepted
+// for the offered transfer ID; they are never embedded in a control record.
+message FileOffer {
+  bytes transfer_id = 1; // Exactly 16 random bytes.
+  string filename = 2;
+  string mime_type = 3;
+  uint64 byte_length = 4;
+  bytes sha256 = 5; // Exactly 32 bytes.
+}
+
+message FileDecision {
+  bytes transfer_id = 1;
+  bool accepted = 2;
+}
+
+// Binds an accepted offer to a StreamOpen/StreamOpened QUIC stream. The sender
+// sends this record before file bytes. A receiver accepts it only if the stream
+// belongs to the same capability session and the offer was accepted.
+message FileContentStart {
+  bytes transfer_id = 1;
+  uint64 quic_stream_id = 2;
+}
+
+message FileComplete {
+  bytes transfer_id = 1;
+  bytes sha256 = 2; // SHA-256 of received bytes.
+}

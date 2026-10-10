@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package anchor.v1;
+
+import "anchor/v1/common.proto";
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1";
+option swift_prefix = "ANCH";
+
+// A short-lived, single-use bootstrap record encoded by a host UI as a QR code.
+// It is not a credential and must not be persisted after expiry or use.
+message PairingInvitation {
+  ProtocolVersion protocol_version = 1;
+  bytes invitation_id = 2; // Exactly 16 random bytes.
+  string endpoint = 3; // Host or numeric address with a UDP port.
+  NodeId inviter_node_id = 4;
+  bytes inviter_certificate_fingerprint = 5; // SHA-256: exactly 32 bytes.
+  uint64 expires_at_unix_ms = 6;
+  bytes pairing_nonce = 7; // Exactly 32 random bytes, bound into the SAS.
+
+  // The exact self-signed leaf certificate presented by the inviter during
+  // the pairing-only QUIC handshake. It is public key material, not a secret.
+  // Receivers reject values above 4096 bytes and verify its SHA-256 equals
+  // inviter_certificate_fingerprint before offering it to TLS. A fingerprint
+  // alone identifies a certificate but cannot construct a pinning trust store.
+  bytes inviter_certificate_der = 8;
+
+  // The host's discovery/store key (currently the desktop installation UUID).
+  // It is routing metadata only: trust still comes solely from the certificate
+  // pin above. This lets pairing reconcile later mDNS advertisements without
+  // inventing a second node-ID-to-installation-ID mapping.
+  string inviter_device_id = 9;
+}
+
+// The first pairing message after TLS. The TLS certificate is intentionally not
+// duplicated here: the transport supplies it and the SDK validates it.
+message PairingHello {
+  bytes invitation_id = 1; // Empty only for nearby/manual pairing mode.
+  NodeId node_id = 2;
+  PeerDisplayInfo display = 3;
+
+  // SHA-256 of the canonical pairing transcript known so far. This binds the
+  // user-visible approval to the connection and prevents UI/session mixups.
+  bytes transcript_hash = 4;
+}
+
+// Sent only after local user approval. The SDK derives the short authentication
+// string from the same transcript; it never sends that short code on the wire.
+message PairingApprove {
+  bytes transcript_hash = 1; // SHA-256: exactly 32 bytes.
+
+  // Present for a direct-address pairing, where discovery did not supply a
+  // certificate pin before TLS started. The client persists this exact leaf
+  // only after the desktop user approves. It is public identity material,
+  // bounded to keep the pairing control record small.
+  bytes approver_certificate_der = 2;
+
+  // The desktop's stable store key. This is routing metadata, not a trust
+  // decision: trust comes from approver_certificate_der above.
+  string approver_device_id = 3;
+}
+
+// A refusal reveals no local policy details. The host may show a richer local
+// explanation, but the peer only learns that pairing did not proceed.
+message PairingReject {}

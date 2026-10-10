@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package anchor.v1;
+
+import "anchor/v1/common.proto";
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1";
+option swift_prefix = "ANCH";
+
+// A service implemented by one named endpoint. `name` is a reverse-DNS
+// capability namespace such as "org.anchor.clipboard"; `major` is its
+// independently compatible capability version.
+message CapabilityAdvertisement {
+  string name = 1;
+  uint32 major = 2;
+
+  // Exact protobuf type URLs accepted in CapabilityRecord for this capability.
+  // This list is a protocol allow-list, not a UI description.
+  repeated string record_type_urls = 3;
+
+  // The capability may request datagram flows only when this is true.
+  bool supports_datagrams = 4;
+}
+
+// An application-defined provider address on a node. Endpoint IDs are
+// reverse-DNS strings, e.g. "io.anchor.desktop" or
+// "org.example.photos.android". They are routing names, not identities.
+message EndpointAdvertisement {
+  string endpoint_id = 1;
+  repeated CapabilityAdvertisement capabilities = 2;
+}
+
+// Opens one advertised endpoint/capability pair. The opener allocates a
+// non-zero session ID: the QUIC connection initiator uses odd IDs, the
+// connection responder uses even IDs. This permits both peers to open sessions
+// concurrently without collision.
+message CapabilityOpen {
+  uint64 capability_session_id = 1;
+  string endpoint_id = 2;
+  string capability_name = 3;
+  uint32 capability_major = 4;
+}
+
+// A positive reply to CapabilityOpen. It repeats the session ID so a host can
+// correlate an asynchronous close/error without looking up the request.
+message CapabilityOpened {
+  uint64 capability_session_id = 1;
+}
+
+// A close is idempotent. Once sent or received, future records for the session
+// are protocol violations and must not reach the provider.
+message CapabilityClose {
+  uint64 capability_session_id = 1;
+  ErrorCode reason = 2;
+}
+
+// Typed reliable data for an established capability session. `type_url` must
+// exactly match one of the session's advertised record_type_urls. `payload` is
+// the serialized protobuf message named by that type URL; it is not a generic
+// escape hatch because the negotiated allow-list fixes its schema beforehand.
+message CapabilityRecord {
+  uint64 capability_session_id = 1;
+  string type_url = 2;
+  bytes payload = 3;
+}

@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package anchor.v1;
+
+import "anchor/v1/common.proto";
+import "anchor/v1/capability.proto";
+import "anchor/v1/datagram.proto";
+import "anchor/v1/pairing.proto";
+import "anchor/v1/session.proto";
+import "anchor/v1/stream.proto";
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1";
+option swift_prefix = "ANCH";
+
+// The only protobuf record type carried on Anchor's ordered QUIC control
+// stream. Records are unsigned-varint length-delimited by the stream framing.
+//
+// Request/reply correlation stays in this common envelope so feature messages
+// do not each invent their own sequence rules. A request sets request_id only;
+// its reply sets response_to only; a notification sets neither. Pairing uses
+// notifications because both peers may independently approve or reject.
+message ControlEnvelope {
+  uint64 request_id = 1;
+  uint64 response_to = 2;
+
+  oneof body {
+    PairingHello pairing_hello = 10;
+    PairingApprove pairing_approve = 11;
+    PairingReject pairing_reject = 12;
+    ProtocolError protocol_error = 13;
+    SessionHello session_hello = 14;
+    SessionReady session_ready = 15;
+    Ping ping = 16;
+    Pong pong = 17;
+    SessionClose session_close = 18;
+    CapabilityOpen capability_open = 19;
+    CapabilityOpened capability_opened = 20;
+    CapabilityClose capability_close = 21;
+    CapabilityRecord capability_record = 22;
+    StreamOpen stream_open = 23;
+    StreamOpened stream_opened = 24;
+    StreamClose stream_close = 25;
+    DatagramFlowOpen datagram_flow_open = 26;
+    DatagramFlowOpened datagram_flow_opened = 27;
+    DatagramFlowClose datagram_flow_close = 28;
+  }
+}

@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package anchor.v1.capabilities.media;
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1.capabilities.media";
+option swift_prefix = "ANCHMedia";
+
+message MediaState {
+  string title = 1;
+  string artist = 2;
+  string album = 3;
+  bool playing = 4;
+  uint64 position_ms = 5;
+  uint64 duration_ms = 6;
+  bytes artwork_jpeg = 7;
+}
+
+enum MediaCommandKind {
+  MEDIA_COMMAND_KIND_UNSPECIFIED = 0;
+  MEDIA_COMMAND_KIND_PLAY = 1;
+  MEDIA_COMMAND_KIND_PAUSE = 2;
+  MEDIA_COMMAND_KIND_NEXT = 3;
+  MEDIA_COMMAND_KIND_PREVIOUS = 4;
+  MEDIA_COMMAND_KIND_SEEK = 5;
+}
+
+message MediaCommand {
+  MediaCommandKind kind = 1;
+  uint64 position_ms = 2; // Used only by SEEK.
+}

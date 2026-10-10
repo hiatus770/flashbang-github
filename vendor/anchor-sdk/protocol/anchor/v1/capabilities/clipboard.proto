@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package anchor.v1.capabilities.clipboard;
+
+import "anchor/v1/common.proto";
+
+option java_multiple_files = true;
+option java_package = "org.anchor.sdk.v1.capabilities.clipboard";
+option swift_prefix = "ANCHClipboard";
+
+// The sole initial content type for org.anchor.clipboard@1. A provider
+// advertises this capability with the following type URLs:
+//
+//   type.googleapis.com/anchor.v1.capabilities.clipboard.ClipboardPublish
+//   type.googleapis.com/anchor.v1.capabilities.clipboard.ClipboardClear
+//
+// The serialized message must fit the capability-record size limit (initially
+// 1 MiB, to be placed in the v1 limits fixture before SDK implementation).
+// Larger data uses a future, explicitly designed content-stream contract.
+
+// Replaces the receiver's current clipboard value. `origin_node_id` and
+// `revision` let each provider suppress reflected updates: a provider must not
+// republish a value it learned from the same origin/revision pair.
+message ClipboardPublish {
+  anchor.v1.NodeId origin_node_id = 1;
+  uint64 revision = 2;
+
+  oneof content {
+    string text_utf8 = 3;
+    bytes png = 4;
+  }
+}
+
+// Removes a clipboard value previously published by the stated origin. This is
+// deliberately separate from an empty text payload: an empty string is valid
+// clipboard content.
+message ClipboardClear {
+  anchor.v1.NodeId origin_node_id = 1;
+  uint64 revision = 2;
+}

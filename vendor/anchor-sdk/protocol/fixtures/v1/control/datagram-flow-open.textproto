@@ -1,0 +1,6 @@
+request_id: 3
+datagram_flow_open {
+  capability_session_id: 1
+  flow_id: 1
+  payload_type_url: "type.googleapis.com/anchor.v1.capabilities.clipboard.ClipboardPublish"
+}

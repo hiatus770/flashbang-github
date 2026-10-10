@@ -1,0 +1,5 @@
+request_id: 2
+stream_open {
+  quic_stream_id: 4
+  capability_session_id: 1
+}
